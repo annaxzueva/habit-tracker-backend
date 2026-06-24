@@ -1,4 +1,5 @@
 package com.example.habit_tracker_backend.entity;
+
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -20,6 +21,7 @@ public class HabitLog {
     @Column(columnDefinition = "TEXT")
     private String note;
 
+    // Геттеры и сеттеры
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

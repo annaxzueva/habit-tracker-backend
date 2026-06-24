@@ -19,10 +19,14 @@ public class HabitTrackerBackendApplication {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**")
-						.allowedOrigins("*")
-						.allowedMethods("*")
+						.allowedOrigins(
+								"http://localhost:3000",
+								"http://localhost:5500",
+								"https://beamish-nougat-01aa70.netlify.app"
+						)
+						.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
 						.allowedHeaders("*")
-						.allowCredentials(false);
+						.allowCredentials(true);
 			}
 		};
 	}

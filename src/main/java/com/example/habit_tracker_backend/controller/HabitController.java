@@ -10,10 +10,14 @@ import org.springframework.web.bind.annotation.*;
 import com.example.habit_tracker_backend.dto.CreateHabitRequest;
 import java.time.LocalDateTime;
 import java.util.List;
+import com.example.habit_tracker_backend.entity.HabitLog;
+import com.example.habit_tracker_backend.repository.HabitLogRepository;
 
 @RestController
 @RequestMapping("/api/habits")
 public class HabitController {
+    @Autowired
+    private HabitLogRepository habitLogRepository;
 
     @Autowired
     private HabitRepository habitRepository;
@@ -53,6 +57,19 @@ public class HabitController {
         habit.setIsActive(true);
 
         Habit saved = habitRepository.save(habit);
+        return ResponseEntity.ok(saved);
+    }
+
+    @PostMapping("/{habitId}/complete")
+    public ResponseEntity<HabitLog> completeHabit(@PathVariable Long habitId) {
+        Habit habit = habitRepository.findById(habitId)
+                .orElseThrow(() -> new RuntimeException("Привычка не найдена"));
+
+        HabitLog log = new HabitLog();
+        log.setHabit(habit);
+        log.setCompletedAt(LocalDateTime.now());
+
+        HabitLog saved = habitLogRepository.save(log);
         return ResponseEntity.ok(saved);
     }
 }

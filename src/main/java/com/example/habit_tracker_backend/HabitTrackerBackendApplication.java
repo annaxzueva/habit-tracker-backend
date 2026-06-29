@@ -22,7 +22,7 @@ public class HabitTrackerBackendApplication {
 						.allowedOrigins(
 								"http://localhost:3000",
 								"http://localhost:5500",
-								"https://amazing-kheer-56543d.netlify.app"
+								"https://glittery-marigold-26034a.netlify.app"
 								//"https://beamish-nougat-01aa70.netlify.app"
 						)
 						.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")

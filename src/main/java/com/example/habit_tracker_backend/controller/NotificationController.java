@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
+import jakarta.annotation.PostConstruct;
 
 @RestController
 @RequestMapping("/api/notifications")
@@ -18,6 +19,10 @@ public class NotificationController {
 
     // Хранилище подписок (в реальном проекте — в БД)
     private final List<SubscriptionData> subscriptions = new ArrayList<>();
+    @PostConstruct
+    public void init() {
+        System.out.println("✅ NotificationController загружен");
+    }
 
     @PostMapping("/subscribe")
     public void subscribe(@RequestBody SubscribeRequest request) {

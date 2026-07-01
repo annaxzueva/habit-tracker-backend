@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.habit_tracker_backend.dto.CreateHabitRequest;
-
+import java.util.stream.Collectors;
+import com.example.habit_tracker_backend.dto.HabitResponseDTO;
+import com.example.habit_tracker_backend.dto.HabitLogDTO;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -36,18 +38,39 @@ public class HabitController {
 
     // ПРОВЕРКА: возвращаем привычки пользователя
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Habit>> getHabitsByUser(@PathVariable Long userId) {
+    public ResponseEntity<List<HabitResponseDTO>> getHabitsByUser(@PathVariable Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-        // Загружаем привычки с логами
         List<Habit> habits = habitRepository.findByUser(user);
-        habits.forEach(habit -> {
-            // Принудительно загружаем habitLogs, чтобы они попали в JSON
-            habit.getHabitLogs().size();
-        });
 
-        return ResponseEntity.ok(habits);
+        List<HabitResponseDTO> response = habits.stream().map(habit -> {
+            HabitResponseDTO dto = new HabitResponseDTO();
+            dto.setId(habit.getId());
+            dto.setTitle(habit.getTitle());
+            dto.setDescription(habit.getDescription());
+            dto.setColor(habit.getColor());
+            dto.setFrequencyType(habit.getFrequencyType());
+            dto.setFrequencyDays(habit.getFrequencyDays());
+            dto.setPlantType(habit.getPlantType());
+            dto.setPlantStage(habit.getPlantStage());
+            dto.setCreatedAt(habit.getCreatedAt());
+            dto.setIsActive(habit.getIsActive());
+
+            // Преобразуем список логов
+            List<HabitLogDTO> logDTOs = habit.getHabitLogs().stream().map(log -> {
+                HabitLogDTO logDTO = new HabitLogDTO();
+                logDTO.setId(log.getId());
+                logDTO.setCompletedAt(log.getCompletedAt());
+                logDTO.setNote(log.getNote());
+                return logDTO;
+            }).collect(Collectors.toList());
+
+            dto.setHabitLogs(logDTOs);
+            return dto;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping

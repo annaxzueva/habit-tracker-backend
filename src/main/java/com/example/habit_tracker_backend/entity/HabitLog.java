@@ -3,6 +3,7 @@ package com.example.habit_tracker_backend.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -19,7 +20,7 @@ public class HabitLog {
     private Habit habit;
 
     @Column(name = "completed_at", nullable = false)
-    private LocalDateTime completedAt;
+    private LocalDate completedAt;
 
     @Column(columnDefinition = "TEXT")
     private String note;
@@ -42,11 +43,11 @@ public class HabitLog {
         this.habit = habit;
     }
 
-    public LocalDateTime getCompletedAt() {
+    public LocalDate getCompletedAt() {
         return completedAt;
     }
 
-    public void setCompletedAt(LocalDateTime completedAt) {
+    public void setCompletedAt(LocalDate completedAt) {
         this.completedAt = completedAt;
     }
 

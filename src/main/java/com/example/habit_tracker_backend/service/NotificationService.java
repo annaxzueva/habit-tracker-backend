@@ -25,6 +25,12 @@ public class NotificationService {
         this.repository = repository;
     }
 
+
+
+    public void saveSubscription(NotificationSubscription subscription) {
+        repository.save(subscription);
+    }
+
     public void sendToUser(Long userId, String payload) throws Exception {
 
         List<NotificationSubscription> subs =

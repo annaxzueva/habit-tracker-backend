@@ -11,6 +11,7 @@ import com.example.habit_tracker_backend.dto.CreateHabitRequest;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import com.example.habit_tracker_backend.entity.HabitLog;
 import com.example.habit_tracker_backend.repository.HabitLogRepository;
@@ -63,8 +64,7 @@ public class HabitController {
         habit.setFrequencyDays(request.getFrequencyDays());
         habit.setPlantType(request.getPlantType());
         habit.setPlantStage(request.getPlantStage() != null ? request.getPlantStage() : 0);
-        habit.setCreatedAt(LocalDate.now());
-        habit.setIsActive(true);
+        habit.setCreatedAt(LocalDateTime.now(ZoneId.of("Europe/Moscow")));        habit.setIsActive(true);
 
         Habit saved = habitRepository.save(habit);
         return ResponseEntity.ok(saved);
@@ -77,8 +77,7 @@ public class HabitController {
 
         HabitLog log = new HabitLog();
         log.setHabit(habit);
-        log.setCompletedAt(LocalDate.now());
-
+        log.setCompletedAt(LocalDate.now(ZoneId.of("Europe/Moscow")));
         HabitLog saved = habitLogRepository.save(log);
         return ResponseEntity.ok(saved);
     }
@@ -104,12 +103,14 @@ public class HabitController {
         Habit habit = habitRepository.findById(habitId)
                 .orElseThrow(() -> new RuntimeException("Привычка не найдена"));
 
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(ZoneId.of("Europe/Moscow"));
 
         habitLogRepository.findByHabitAndCompletedAt(habit, today)
                 .ifPresent(habitLogRepository::delete);
 
         return ResponseEntity.noContent().build();
+
+
     }
 
 }

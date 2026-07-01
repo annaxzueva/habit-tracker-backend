@@ -4,7 +4,7 @@ import com.example.habit_tracker_backend.entity.User;
 import com.example.habit_tracker_backend.repository.UserRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
+import java.time.ZoneId;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -24,7 +24,7 @@ public class NotificationScheduler {
     @Scheduled(fixedRate = 60000)
     public void checkNotifications() {
 
-        LocalTime now = LocalTime.now()
+        LocalTime now = LocalTime.now(ZoneId.of("Europe/Moscow"))
                 .withSecond(0)
                 .withNano(0);
 

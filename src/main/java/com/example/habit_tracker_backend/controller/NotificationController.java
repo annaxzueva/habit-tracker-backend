@@ -3,15 +3,24 @@ package com.example.habit_tracker_backend.controller;
 import com.example.habit_tracker_backend.entity.NotificationSubscription;
 import com.example.habit_tracker_backend.service.NotificationService;
 import org.springframework.web.bind.annotation.*;
+import com.example.habit_tracker_backend.entity.User;
+import com.example.habit_tracker_backend.repository.UserRepository;
+import org.springframework.http.ResponseEntity;
+import java.time.LocalTime;
 
 @RestController
 @RequestMapping("/api/notifications")
 public class NotificationController {
 
     private final NotificationService service;
+    private final UserRepository userRepository;
 
-    public NotificationController(NotificationService service) {
+    public NotificationController(
+            NotificationService service,
+            UserRepository userRepository
+    ) {
         this.service = service;
+        this.userRepository = userRepository;
     }
 
     // сохранить подписку
@@ -39,6 +48,57 @@ public class NotificationController {
         service.sendToUser(userId, payload);
 
         System.out.println("✅ Уведомления отправлены");
+    }
+
+    @PostMapping("/settings")
+    public ResponseEntity<String> saveSettings(
+            @RequestBody NotificationSettingsRequest request) {
+
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setNotificationsEnabled(request.getEnabled());
+
+        if (request.getTime() != null && !request.getTime().isBlank()) {
+            user.setNotificationTime(LocalTime.parse(request.getTime()));
+        }
+
+        userRepository.save(user);
+
+        System.out.println("✅ Настройки уведомлений сохранены");
+
+        return ResponseEntity.ok("Настройки сохранены");
+    }
+
+    public static class NotificationSettingsRequest {
+
+        private Long userId;
+        private Boolean enabled;
+        private String time;
+
+        public Long getUserId() {
+            return userId;
+        }
+
+        public void setUserId(Long userId) {
+            this.userId = userId;
+        }
+
+        public Boolean getEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(Boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public String getTime() {
+            return time;
+        }
+
+        public void setTime(String time) {
+            this.time = time;
+        }
     }
 
     // DTO

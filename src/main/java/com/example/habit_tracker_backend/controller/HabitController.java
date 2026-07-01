@@ -73,6 +73,8 @@ public class HabitController {
         return ResponseEntity.ok(response);
     }
 
+
+
     @PostMapping
     public ResponseEntity<Habit> createHabit(@RequestBody CreateHabitRequest request) {
         User user = userRepository.findById(request.getUserId())

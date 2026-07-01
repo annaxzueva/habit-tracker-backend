@@ -7,13 +7,3 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
 }
-
-private final UserRepository userRepository;
-
-public NotificationController(
-        NotificationService service,
-        UserRepository userRepository
-) {
-    this.service = service;
-    this.userRepository = userRepository;
-}

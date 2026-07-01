@@ -26,13 +26,27 @@ public class NotificationController {
         try {
             System.out.println("📝 Настройки получены:");
             System.out.println("  userId: " + request.getUserId());
-            System.out.println("  enabled: " + request.getNotificationsEnabled());
-            System.out.println("  time: " + request.getNotificationTime());
+            System.out.println("  enabled: " + request.getEnabled());      // ← enabled
+            System.out.println("  time: " + request.getTime());            // ← time
 
-            // Временно: просто возвращаем OK, ничего не сохраняем
-            return ResponseEntity.ok("Настройки приняты (временно)");
+            User user = userRepository.findById(request.getUserId())
+                    .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+
+            // ===== ИСПОЛЬЗУЕМ enabled И time =====
+            if (request.getEnabled() != null) {
+                user.setNotificationsEnabled(request.getEnabled());
+            }
+            if (request.getTime() != null && !request.getTime().isEmpty()) {
+                user.setNotificationTime(LocalTime.parse(request.getTime()));
+            }
+
+            User updated = userRepository.save(user);
+            System.out.println("✅ Настройки сохранены для пользователя: " + updated.getId());
+
+            return ResponseEntity.ok(updated);
 
         } catch (Exception e) {
+            System.err.println("❌ Ошибка сохранения настроек: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.status(500).body("Ошибка: " + e.getMessage());
         }
@@ -90,21 +104,7 @@ public class NotificationController {
         System.out.println("✅ Уведомления отправлены");
     }
 
-    // ===== DTO ДЛЯ НАСТРОЕК =====
-    public static class SettingsRequest {
-        private Long userId;
-        private Boolean notificationsEnabled;
-        private String notificationTime;
 
-        public Long getUserId() { return userId; }
-        public void setUserId(Long userId) { this.userId = userId; }
-
-        public Boolean getNotificationsEnabled() { return notificationsEnabled; }
-        public void setNotificationsEnabled(Boolean notificationsEnabled) { this.notificationsEnabled = notificationsEnabled; }
-
-        public String getNotificationTime() { return notificationTime; }
-        public void setNotificationTime(String notificationTime) { this.notificationTime = notificationTime; }
-    }
 
     // ===== DTO ДЛЯ ПОДПИСКИ =====
     public static class SubscribeRequest {
@@ -138,5 +138,21 @@ public class NotificationController {
 
         public String getAuth() { return auth; }
         public void setAuth(String auth) { this.auth = auth; }
+    }
+
+    public static class SettingsRequest {
+        private Long userId;
+        private Boolean enabled;        // ← соответствует enabled из фронтенда
+        private String time;            // ← соответствует time из фронтенда
+        // habits не нужно
+
+        public Long getUserId() { return userId; }
+        public void setUserId(Long userId) { this.userId = userId; }
+
+        public Boolean getEnabled() { return enabled; }
+        public void setEnabled(Boolean enabled) { this.enabled = enabled; }
+
+        public String getTime() { return time; }
+        public void setTime(String time) { this.time = time; }
     }
 }

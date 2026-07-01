@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.habit_tracker_backend.dto.CreateHabitRequest;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import com.example.habit_tracker_backend.entity.HabitLog;
@@ -61,7 +63,7 @@ public class HabitController {
         habit.setFrequencyDays(request.getFrequencyDays());
         habit.setPlantType(request.getPlantType());
         habit.setPlantStage(request.getPlantStage() != null ? request.getPlantStage() : 0);
-        habit.setCreatedAt(LocalDateTime.now());
+        habit.setCreatedAt(LocalDate.now());
         habit.setIsActive(true);
 
         Habit saved = habitRepository.save(habit);
@@ -75,9 +77,39 @@ public class HabitController {
 
         HabitLog log = new HabitLog();
         log.setHabit(habit);
-        log.setCompletedAt(LocalDateTime.now());
+        log.setCompletedAt(LocalDate.now());
 
         HabitLog saved = habitLogRepository.save(log);
         return ResponseEntity.ok(saved);
     }
+
+    @DeleteMapping("/{habitId}")
+    public ResponseEntity<Void> deleteHabit(@PathVariable Long habitId) {
+
+        Habit habit = habitRepository.findById(habitId)
+                .orElseThrow(() -> new RuntimeException("Привычка не найдена"));
+
+        // Сначала удаляем все отметки выполнения
+        habitLogRepository.deleteAll(habit.getHabitLogs());
+
+        // Затем удаляем привычку
+        habitRepository.delete(habit);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{habitId}/log")
+    public ResponseEntity<Void> deleteHabitLog(@PathVariable Long habitId) {
+
+        Habit habit = habitRepository.findById(habitId)
+                .orElseThrow(() -> new RuntimeException("Привычка не найдена"));
+
+        LocalDate today = LocalDate.now();
+
+        habitLogRepository.findByHabitAndCompletedAt(habit, today)
+                .ifPresent(habitLogRepository::delete);
+
+        return ResponseEntity.noContent().build();
+    }
+
 }

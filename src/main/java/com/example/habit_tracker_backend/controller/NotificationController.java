@@ -1,66 +1,47 @@
 package com.example.habit_tracker_backend.controller;
 
-import nl.martijndwars.webpush.Notification;
-import nl.martijndwars.webpush.PushService;
-import nl.martijndwars.webpush.Subscription;
-import org.springframework.beans.factory.annotation.Value;
+import com.example.habit_tracker_backend.entity.NotificationSubscription;
+import com.example.habit_tracker_backend.service.NotificationService;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/notifications")
 public class NotificationController {
 
-    @Value("${vapid.private.key}")
-    private String privateKey;
+    private final NotificationService service;
 
-    private final List<SubscriptionData> subscriptions = new ArrayList<>();
+    public NotificationController(NotificationService service) {
+        this.service = service;
+    }
 
+    // сохранить подписку
     @PostMapping("/subscribe")
     public void subscribe(@RequestBody SubscribeRequest request) {
 
-        Subscription.Keys keys = new Subscription.Keys(
-                request.getSubscription().getKeys().getP256dh(),
-                request.getSubscription().getKeys().getAuth()
-        );
+        NotificationSubscription sub = new NotificationSubscription();
+        sub.setUserId(request.getUserId());
+        sub.setEndpoint(request.getSubscription().getEndpoint());
+        sub.setP256dh(request.getSubscription().getKeys().getP256dh());
+        sub.setAuth(request.getSubscription().getKeys().getAuth());
 
-        Subscription subscription = new Subscription(
-                request.getSubscription().getEndpoint(),
-                keys
-        );
+        service.saveSubscription(sub);
 
-        subscriptions.add(new SubscriptionData(
-                request.getUserId(),
-                subscription
-        ));
-
-        System.out.println("✅ Подписка сохранена");
+        System.out.println("✅ Подписка сохранена в БД");
     }
 
-    @PostMapping("/send-test")
-    public void sendTestNotification() throws Exception {
-
-        PushService pushService = new PushService();
-
-        pushService.setPrivateKey(privateKey);
+    // тестовая отправка
+    @PostMapping("/send-test/{userId}")
+    public void sendTest(@PathVariable Long userId) throws Exception {
 
         String payload =
                 "{\"title\":\"Напоминание\",\"body\":\"Пора выполнить привычку!\"}";
 
-        for (SubscriptionData data : subscriptions) {
-            Notification notification =
-                    new Notification(data.subscription, payload);
+        service.sendToUser(userId, payload);
 
-            pushService.send(notification);
-        }
-
-        System.out.println("✅ Все уведомления отправлены");
+        System.out.println("✅ Уведомления отправлены");
     }
 
-    // ================= DTO =================
-
+    // DTO
     public static class SubscribeRequest {
 
         private Long userId;
@@ -124,17 +105,6 @@ public class NotificationController {
 
         public void setAuth(String auth) {
             this.auth = auth;
-        }
-    }
-
-    public static class SubscriptionData {
-
-        private final Long userId;
-        private final Subscription subscription;
-
-        public SubscriptionData(Long userId, Subscription subscription) {
-            this.userId = userId;
-            this.subscription = subscription;
         }
     }
 }

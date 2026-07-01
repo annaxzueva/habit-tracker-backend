@@ -8,3 +8,4 @@ import java.util.List;
 public interface HabitLogRepository extends JpaRepository<HabitLog, Long> {
     List<HabitLog> findByHabit(Habit habit);
 }
+

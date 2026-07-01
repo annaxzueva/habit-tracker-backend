@@ -49,7 +49,7 @@ public class Habit {
 
 
     @OneToMany(mappedBy = "habit", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonProperty
+    @JsonIgnore
     private List<HabitLog> habitLogs;
 
     // Геттеры и сеттеры

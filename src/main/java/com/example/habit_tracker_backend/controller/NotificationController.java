@@ -26,13 +26,12 @@ public class NotificationController {
         try {
             System.out.println("📝 Настройки получены:");
             System.out.println("  userId: " + request.getUserId());
-            System.out.println("  enabled: " + request.getEnabled());      // ← enabled
-            System.out.println("  time: " + request.getTime());            // ← time
+            System.out.println("  enabled: " + request.getEnabled());
+            System.out.println("  time: " + request.getTime());
 
             User user = userRepository.findById(request.getUserId())
                     .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
-            // ===== ИСПОЛЬЗУЕМ enabled И time =====
             if (request.getEnabled() != null) {
                 user.setNotificationsEnabled(request.getEnabled());
             }

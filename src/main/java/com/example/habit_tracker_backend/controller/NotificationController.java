@@ -51,36 +51,6 @@ public class NotificationController {
         }
     }
 
-//    // ===== СОХРАНЕНИЕ НАСТРОЕК УВЕДОМЛЕНИЙ =====
-//    @PostMapping("/settings")
-//    public ResponseEntity<?> saveSettings(@RequestBody SettingsRequest request) {
-//        try {
-//            System.out.println("📝 Настройки получены:");
-//            System.out.println("  userId: " + request.getUserId());
-//            System.out.println("  enabled: " + request.getNotificationsEnabled());
-//            System.out.println("  time: " + request.getNotificationTime());
-//
-//            User user = userRepository.findById(request.getUserId())
-//                    .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-//
-//            if (request.getNotificationsEnabled() != null) {
-//                user.setNotificationsEnabled(request.getNotificationsEnabled());
-//            }
-//            if (request.getNotificationTime() != null && !request.getNotificationTime().isEmpty()) {
-//                user.setNotificationTime(LocalTime.parse(request.getNotificationTime()));
-//            }
-//
-//            User updated = userRepository.save(user);
-//            System.out.println("✅ Настройки сохранены для пользователя: " + updated.getId());
-//
-//            return ResponseEntity.ok(updated);
-//
-//        } catch (Exception e) {
-//            System.err.println("❌ Ошибка сохранения настроек: " + e.getMessage());
-//            e.printStackTrace();
-//            return ResponseEntity.status(500).body("Ошибка: " + e.getMessage());
-//        }
-//    }
 
     // ===== СОХРАНЕНИЕ ПОДПИСКИ =====
     @PostMapping("/subscribe")
